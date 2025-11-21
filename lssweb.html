@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Left-Sided Studios</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lucide/0.263.1/umd/lucide.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap');
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0a0a0a;
+            color: #e5e5e5;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #0a0a0a; }
+        ::-webkit-scrollbar-thumb { background: #333; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #555; }
+
+        .fade-in {
+            animation: fadeIn 0.4s ease-out forwards;
+            opacity: 0;
+            transform: translateY(10px);
+        }
+
+        @keyframes fadeIn {
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .card-hover {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .card-hover:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 40px -10px rgba(255,255,255,0.1);
+            border-color: rgba(255,255,255,0.4);
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col">
+
+    <!-- Navigation -->
+    <nav class="fixed top-0 w-full z-50 bg-black/80 backdrop-blur-md border-b border-white/10">
+        <div class="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
+            <div class="text-xl font-bold tracking-tighter cursor-pointer hover:text-white transition-colors" onclick="renderPage('home')">
+                LEFT-SIDED <span class="text-gray-500">STUDIOS</span>
+            </div>
+            <div class="hidden md:flex space-x-8 text-sm font-medium text-gray-400">
+                <button onclick="renderPage('games')" class="hover:text-white transition-colors">GAMES</button>
+                <button onclick="renderPage('subsidiaries')" class="hover:text-white transition-colors">SUBSIDIARIES</button>
+                <button onclick="renderPage('partners')" class="hover:text-white transition-colors">PARTNERS</button>
+                <button onclick="scrollToBottom()" class="hover:text-white transition-colors">CONTACT</button>
+            </div>
+            <button class="md:hidden text-white" onclick="toggleMobileMenu()">
+                <i data-lucide="menu"></i>
+            </button>
+        </div>
+        
+        <!-- Mobile Menu -->
+        <div id="mobile-menu" class="hidden md:hidden bg-neutral-900 border-b border-white/10">
+            <div class="flex flex-col p-4 space-y-4">
+                <button onclick="renderPage('games'); toggleMobileMenu()" class="text-left text-gray-300">Games</button>
+                <button onclick="renderPage('subsidiaries'); toggleMobileMenu()" class="text-left text-gray-300">Subsidiaries</button>
+                <button onclick="renderPage('partners'); toggleMobileMenu()" class="text-left text-gray-300">Partners</button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content Area -->
+    <main id="app" class="flex-grow pt-24 pb-20 px-6 max-w-7xl mx-auto w-full">
+        <!-- Content is injected here by JS -->
+    </main>
+
+    <!-- Footer -->
+    <footer class="border-t border-white/10 py-12 bg-neutral-950 mt-auto">
+        <div class="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-3 gap-12">
+            <div>
+                <h3 class="text-lg font-bold mb-4 text-white">Left-Sided Studios</h3>
+                <p class="text-gray-500 text-sm leading-relaxed">
+                    Independent game development studio sharing original games and projects on GameJolt and other platforms.
+                </p>
+            </div>
+            <div>
+                <h3 class="text-lg font-bold mb-4 text-white">Connect</h3>
+                <ul class="space-y-2 text-sm text-gray-500">
+                    <li><a href="https://gamejolt.com/@LeftSidedStudios" target="_blank" class="hover:text-white transition-colors">GameJolt</a></li>
+                    <li><a href="https://youtube.com/@vermetra" target="_blank" class="hover:text-white transition-colors">YouTube (Vermetra)</a></li>
+                    <li><a href="#" class="hover:text-white transition-colors">Discord</a></li>
+                    <li><a href="mailto:leftsidedstudios@gmail.com" class="hover:text-white transition-colors">leftsidedstudios@gmail.com</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="text-center text-neutral-600 text-xs mt-12">
+            &copy; 2025 Left-Sided Studios. All rights reserved.
+        </div>
+    </footer>
+
+    <!-- JAVASCRIPT LOGIC -->
+    <script>
+        // ==========================================
+        // DATABASE: OFFICIAL CONTENT FROM GOOGLE SITES
+        // ==========================================
+        const db = {
+            about: {
+                title: "Welcome to Left-Sided Studios",
+                subtitle: "Explore our creations, updates, and fan content, including unique experiences inspired by popular franchises.",
+                featuredImage: "https://lh3.googleusercontent.com/sitesv/AAzXCkexNtNCKMt08PIC-BZCGmGYGTd0xI7LJDFl0RJntfRzMC6O-oZsHYAFiyuijtzmvdZF9gQzorG5Vc-x2Ve55jQ_Nu273vRZEUidfgB0WbOdaUFQdiJREic78OR-JhFqfg4Tgy7LTXqWa-GqtuziXsMyc0gYI_N91y84RrpvFMJdVoJhkWRu1Nzp=w16383", 
+                text: "Hey all! This is Vermetra, Co-Founder of Left-Sided Studios. We are an independent game development studio sharing original games and projects on GameJolt and other platforms. We build unique experiences ranging from original IPs to fan-inspired media."
+            },
+            // ---------------------------------
+            // MAIN STUDIO GAMES
+            // ---------------------------------
+            games: [
+                {
+                    id: "game_cardamania",
+                    title: "Cardamania",
+                    description: "Lead your Academy to Victory.",
+                    fullText: "The rounds are up and the attacks are inbound. Cardamania is a game inspired by Magic the Gathering Commander where you lead your Academy to Victory in this new online TCG battle game!",
+                    image: "https://images.unsplash.com/photo-1605218427360-6961d3748ea9?auto=format&fit=crop&q=80&w=800", 
+                    releaseDate: "Available Now",
+                    link: "https://gamejolt.com/games/cardamania/1028689"
+                },
+                {
+                    id: "game_bumbl",
+                    title: "Bumbl",
+                    description: "Action-adventure strategy on Planet SL-3.",
+                    fullText: "Bumbl is an action-adventure, strategy game inspired by that one game by that really big Japanese company. Explore the recently discovered planet SL-3, hosting a colorful cast of little 'Buggies' that are here to help you! Collect little artifacts, technology bits, and so much more!",
+                    image: "https://images.unsplash.com/photo-1476067897447-d0c5df27b5df?auto=format&fit=crop&q=80&w=800", 
+                    releaseDate: "Available Now",
+                    link: "https://gamejolt.com/games/bumbl/825643"
+                },
+                {
+                    id: "game_cod_battlegrounds",
+                    title: "Create or Destroy: Battlegrounds",
+                    description: "A sandbox combat experience.",
+                    fullText: "Enter the Battlegrounds. A sandbox combat experience where creativity meets destruction. Build your defenses, craft your loadout, and tear down your enemies.",
+                    image: "https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&q=80&w=800", 
+                    releaseDate: "Available Now",
+                    link: "https://gamejolt.com/games/createordestroy/760772"
+                }
+            ],
+            // ---------------------------------
+            // SUBSIDIARIES & THEIR GAMES
+            // ---------------------------------
+            subsidiaries: [
+                {
+                    id: "sub_ande",
+                    name: "ANdᴱ Studios",
+                    tagline: "Experimental & Fan Projects",
+                    description: "Creators of The Reactor, Five Shifts at Fazbear's, and The Diner.",
+                    fullText: "ANdᴱ Studios focuses on experimental gameplay and high-quality fan works. They are a key pillar of the Left-Sided family.",
+                    image: "https://images.unsplash.com/photo-1511512578047-dfb367046420?auto=format&fit=crop&q=80&w=800",
+                    // SUBSIDIARY GAMES
+                    games: [
+                        {
+                            id: "game_ande_fnaf",
+                            title: "Five Shifts at Fazbear's",
+                            description: "A survival horror fan-game.",
+                            fullText: "You work as a security guard at the local, recently opened Freddy Fazbear's Pizza Parlor. Featuring State of the art "Animatronics", performing and singing robots to bring joy to the children. Recently, the Nightguard stopped showing responding to calls and showing up to work after last night's shift. So you were given a 50% raise to work his shift.",
+                            image: "https://images.unsplash.com/photo-1509248961158-e54f6934749c?auto=format&fit=crop&q=80&w=800", 
+                            releaseDate: "Available on GameJolt",
+                            link: "https://gamejolt.com/games/fsaf/989425"
+                        },
+                        {
+                            id: "game_ande_reactor",
+                            title: "The Reactor",
+                            description: "Simulation and crisis management.",
+                            fullText: "Play as John Rendel, a low-level intern at the Zielum plant, who just so happened to be 2 doors down from ground zero. Your goal is to escape the Superreactor grounds to find your family and get out of Simmersville.",
+                            image: "https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&q=80&w=800", 
+                            releaseDate: "Available on GameJolt",
+                            link: "https://gamejolt.com/games/thereactor/1028009"
+                        },
+                    ]
+                },
+                {
+                    id: "sub_gotchya",
+                    name: "Gotch-ya Studios",
+                    tagline: "Dark Narrative Games",
+                    description: "Home of Shadow of The Sanctified.",
+                    fullText: "Gotch-ya Studios specializes in darker, narrative-driven experiences that challenge the player's perception.",
+                    image: "https://images.unsplash.com/photo-1519074069444-1ba4fff66d16?auto=format&fit=crop&q=80&w=800",
+                    games: [
+                        {
+                            id: "game_gotchya_shadow",
+                            title: "Shadow of The Sanctified",
+                            description: "Dark fantasy RPG adventure.",
+                            fullText: "Explore a world shrouded in darkness. Shadow of The Sanctified combines classic RPG elements with modern storytelling to create an atmospheric journey into the unknown.",
+                            image: "https://images.unsplash.com/photo-1514539079130-25950c84af65?auto=format&fit=crop&q=80&w=800", 
+                            releaseDate: "Available on GameJolt",
+                            link: "https://gamejolt.com/games/SOTF1/1027993"
+                        }
+                    ]
+                },
+                {
+                    id: "sub_bomb_banana",
+                    name: "Bomb Banana Studios",
+                    tagline: "Quirky & Energetic",
+                    description: "Developers of Eyebo.",
+                    fullText: "Bomb Banana Studios brings energy and color to the collective. Their games are known for unique visual styles and fun mechanics.",
+                    image: "https://images.unsplash.com/photo-1520034475321-cbe63696469a?auto=format&fit=crop&q=80&w=800",
+                    games: [
+                        {
+                            id: "game_bomb_eyebo",
+                            title: "Eyebo",
+                            description: "Hack-and-slash platformer.",
+                            fullText: "A hack-and-slash platformer through a grim and monster-filled world. You follow Eyebo, an aspiring warrior, as he tries to make his way to the top.",
+                            image: "https://images.unsplash.com/photo-1550684848-fac1c5b4e853?auto=format&fit=crop&q=80&w=800",
+                            releaseDate: "View on Google Sites",
+                            link: "https://sites.google.com/view/leftsidedstudios/subsidiaries/bomb-banana-studios/eyebo?authuser=0"
+                        }
+                    ]
+                },
+                {
+                    id: "sub_skullix",
+                    name: "Skullix Media Group",
+                    tagline: "Media & Production",
+                    description: "Supporting media production for Left-Sided projects.",
+                    fullText: "Skullix Media Group handles various media production aspects, ensuring high-quality content delivery across the network.",
+                    image: "https://images.unsplash.com/photo-1533488765986-dfa2a9939acd?auto=format&fit=crop&q=80&w=800",
+                    games: []
+                },
+                {
+                    id: "sub_endgame",
+                    name: "Endgame Studios",
+                    tagline: "Innovative Gameplay",
+                    description: "Focused on pushing boundaries with 'Project Sentinel'.",
+                    // Updated full text to include the new project
+                    fullText: "Endgame Studios is the latest addition to our roster, currently working on 'Project Sentinel', an innovative multiplayer tower defense game.",
+                    image: "https://images.unsplash.com/photo-1555680202-c86f0e12f086?auto=format&fit=crop&q=80&w=800",
+                    games: [
+                         // NEW GAME ADDED WITH FULL INFO
+                        {
+                            id: "game_endgame_sentinel",
+                            title: "Project Sentinel",
+                            description: "Innovative multiplayer tower defense.",
+                            fullText: "Project Sentinel is the current unannounced project from Endgame Studios. It is planned to be an innovative multiplayer tower defense game that focuses on cooperative strategy and resource management, pushing the boundaries of the genre.",
+                            image: "https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&q=80&w=800", // Using a tech/strategy image
+                            releaseDate: "Unannounced",
+                            link: null // Explicitly null to disable link
+                        }
+                    ]
+                }
+            ],
+            // ---------------------------------
+            // PARTNERS
+            // ---------------------------------
+            partners: [
+                {
+                    id: "partner_citadel",
+                    name: "Citadel Studios",
+                    type: "Strategic Partner",
+                    description: "Collaborating on shared development goals.",
+                    fullText: "Citadel Studios is a close partner of Left-Sided Studios, working together to expand the reach and quality of indie games.",
+                    image: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&q=80&w=800",
+                    website: "https://gamejolt.com/@CitadelStudiosOfficial"
+                }
+            ]
+        };
+
+        // ==========================================
+        // 2. RENDER LOGIC
+        // ==========================================
+        const app = document.getElementById('app');
+
+        function scrollToBottom() {
+            window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+        }
+
+        function toggleMobileMenu() {
+            document.getElementById('mobile-menu').classList.toggle('hidden');
+        }
+
+        function renderPage(pageName, id = null) {
+            window.scrollTo(0,0);
+            app.innerHTML = '';
+            
+            switch(pageName) {
+                case 'home': renderHome(); break;
+                case 'games': renderGamesList(db.games, "Our Games"); break;
+                case 'gameDetail': renderGameDetail(id); break;
+                case 'subsidiaries': renderSubsidiariesList(); break;
+                case 'subsidiaryDetail': renderSubsidiaryDetail(id); break;
+                case 'partners': renderPartners(); break;
+                case 'partnerDetail': renderPartnerDetail(id); break;
+                default: renderHome();
+            }
+            // Ensure icons are created after content is rendered
+            if (typeof lucide !== 'undefined') {
+                lucide.createIcons();
+            }
+        }
+
+        // --- VIEW: HOME ---
+        function renderHome() {
+            const html = `
+                <div class="fade-in space-y-20">
+                    <section class="relative h-[60vh] w-full rounded-2xl overflow-hidden border border-white/10">
+                        <img src="${db.about.featuredImage}" class="absolute inset-0 w-full h-full object-cover opacity-60" alt="Hero">
+                        <div class="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent"></div>
+                        <div class="absolute bottom-0 left-0 p-8 md:p-16 max-w-3xl">
+                            <h1 class="text-5xl md:text-7xl font-bold text-white mb-6 tracking-tighter">${db.about.title}</h1>
+                            <p class="text-xl text-gray-300 leading-relaxed">${db.about.subtitle}</p>
+                        </div>
+                    </section>
+                    <section class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div onclick="renderPage('games')" class="card-hover bg-neutral-900 p-8 rounded-xl border border-white/5 cursor-pointer group">
+                            <i data-lucide="gamepad-2" class="w-10 h-10 text-white mb-4 group-hover:text-blue-400 transition-colors"></i>
+                            <h2 class="text-2xl font-bold text-white mb-2">Games</h2>
+                            <p class="text-gray-500">Explore our core titles.</p>
+                        </div>
+                        <div onclick="renderPage('subsidiaries')" class="card-hover bg-neutral-900 p-8 rounded-xl border border-white/5 cursor-pointer group">
+                            <i data-lucide="network" class="w-10 h-10 text-white mb-4 group-hover:text-purple-400 transition-colors"></i>
+                            <h2 class="text-2xl font-bold text-white mb-2">Subsidiaries</h2>
+                            <p class="text-gray-500">Meet the specialized teams.</p>
+                        </div>
+                        <div onclick="renderPage('partners')" class="card-hover bg-neutral-900 p-8 rounded-xl border border-white/5 cursor-pointer group">
+                            <i data-lucide="users" class="w-10 h-10 text-white mb-4 group-hover:text-green-400 transition-colors"></i>
+                            <h2 class="text-2xl font-bold text-white mb-2">Partners</h2>
+                            <p class="text-gray-500">Our collaborative network.</p>
+                        </div>
+                    </section>
+                    <section class="max-w-4xl mx-auto text-center border-t border-white/10 pt-12">
+                        <p class="text-2xl md:text-3xl font-light text-gray-400 leading-relaxed">"${db.about.text}"</p>
+                    </section>
+                </div>
+            `;
+            app.innerHTML = html;
+        }
+
+        // --- VIEW: GAMES LIST ---
+        function renderGamesList(gamesArray, title) {
+            let gridHtml = gamesArray.map(game => `
+                <div onclick="renderPage('gameDetail', '${game.id}')" class="fade-in card-hover group cursor-pointer relative aspect-[4/3] overflow-hidden rounded-xl bg-neutral-900 border border-white/10">
+                    <img src="${game.image}" class="absolute inset-0 w-full h-full object-cover opacity-70 group-hover:opacity-40 transition-opacity duration-500" alt="${game.title}">
+                    <div class="absolute inset-0 p-6 flex flex-col justify-end bg-gradient-to-t from-black/90 to-transparent">
+                        <h3 class="text-3xl font-bold text-white mb-2">${game.title}</h3>
+                        <p class="text-gray-300 line-clamp-2">${game.description}</p>
+                        <div class="mt-4 text-sm font-mono text-blue-400 flex items-center gap-2">
+                            DETAILS <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+
+            const html = `
+                <div class="fade-in">
+                    <div class="mb-12 flex items-center gap-4">
+                        <button onclick="renderPage('home')" class="p-2 rounded-full bg-white/5 hover:bg-white/10"><i data-lucide="arrow-left"></i></button>
+                        <h1 class="text-4xl font-bold text-white">${title}</h1>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        ${gridHtml}
+                    </div>
+                </div>
+            `;
+            app.innerHTML = html;
+        }
+
+        // --- VIEW: GAME DETAIL ---
+        function renderGameDetail(gameId) {
+            // Find game in main list OR subsidiaries
+            let game = db.games.find(g => g.id === gameId);
+            let parentContext = 'games';
+            let parentLabel = 'Games';
+            let parentId = null;
+            
+            if (!game) {
+                for (let sub of db.subsidiaries) {
+                    game = sub.games.find(g => g.id === gameId);
+                    if (game) {
+                        parentContext = 'subsidiaryDetail';
+                        parentLabel = sub.name;
+                        parentId = sub.id;
+                        break;
+                    }
+                }
+            }
+
+            const backAction = parentId 
+                ? `renderPage('${parentContext}', '${parentId}')` 
+                : `renderPage('${parentContext}')`;
+
+            // Button logic updated to check for game.link being null
+            const isLinkActive = game.link !== null;
+            const buttonText = isLinkActive ? (game.link.includes('gamejolt') ? 'VIEW ON GAMEJOLT' : 'VIEW WEBSITE') : 'COMING SOON';
+            const buttonAction = isLinkActive ? `window.open('${game.link}', '_blank')` : '';
+            const buttonClass = isLinkActive ? "bg-white hover:bg-gray-200 text-black" : "bg-neutral-800 text-gray-500 cursor-not-allowed";
+
+            const html = `
+                <div class="fade-in max-w-4xl mx-auto">
+                    <div class="mb-8 flex items-center gap-3 text-sm text-gray-500">
+                        <button onclick="${backAction}" class="hover:text-white flex items-center gap-1">
+                            <i data-lucide="chevron-left" class="w-4 h-4"></i> Back to ${parentLabel}
+                        </button>
+                        <span>/</span>
+                        <span class="text-white">${game.title}</span>
+                    </div>
+
+                    <div class="rounded-2xl overflow-hidden border border-white/10 mb-12">
+                        <img src="${game.image}" class="w-full h-[50vh] object-cover" alt="${game.title}">
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-12">
+                        <div class="md:col-span-2">
+                            <h1 class="text-5xl font-bold text-white mb-6">${game.title}</h1>
+                            <p class="text-xl text-gray-300 leading-relaxed mb-8">${game.fullText}</p>
+                        </div>
+                        <div class="md:col-span-1">
+                            <div class="bg-neutral-900 p-6 rounded-xl border border-white/5">
+                                <h3 class="text-sm font-bold text-gray-500 uppercase tracking-wider mb-4">Info</h3>
+                                <div class="space-y-4">
+                                    <div>
+                                        <span class="block text-xs text-gray-600">RELEASE</span>
+                                        <span class="text-white">${game.releaseDate || "Released"}</span>
+                                    </div>
+                                    <div>
+                                        <span class="block text-xs text-gray-600">PLATFORM</span>
+                                        <span class="text-white">PC / Browser</span>
+                                    </div>
+                                    <button ${isLinkActive ? '' : 'disabled'} onclick="${buttonAction}" class="w-full mt-4 font-bold py-3 rounded transition-colors ${buttonClass}">
+                                        ${buttonText}
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            app.innerHTML = html;
+        }
+
+        // --- VIEW: SUBSIDIARIES LIST ---
+        function renderSubsidiariesList() {
+            let gridHtml = db.subsidiaries.map(sub => `
+                <div onclick="renderPage('subsidiaryDetail', '${sub.id}')" class="fade-in card-hover bg-neutral-900 border border-white/5 rounded-xl overflow-hidden cursor-pointer flex flex-col h-full">
+                    <div class="h-48 overflow-hidden relative">
+                         <div class="absolute inset-0 bg-purple-900/20 mix-blend-overlay"></div>
+                         <img src="${sub.image}" class="w-full h-full object-cover" alt="${sub.name}">
+                    </div>
+                    <div class="p-8 flex-grow">
+                        <h3 class="text-2xl font-bold text-white mb-1">${sub.name}</h3>
+                        <p class="text-purple-400 text-xs font-mono uppercase tracking-widest mb-4">${sub.tagline}</p>
+                        <p class="text-gray-400 text-sm">${sub.description}</p>
+                    </div>
+                    <div class="px-8 pb-8 pt-0 flex justify-between items-center">
+                         <span class="text-xs text-gray-500 border border-gray-700 px-2 py-1 rounded-full">${sub.games.length} Projects</span>
+                         <span class="text-xs text-white flex items-center gap-1">View Studio <i data-lucide="arrow-right" class="w-3 h-3"></i></span>
+                    </div>
+                </div>
+            `).join('');
+
+            const html = `
+                <div class="fade-in">
+                    <div class="mb-12 flex items-center gap-4">
+                        <button onclick="renderPage('home')" class="p-2 rounded-full bg-white/5 hover:bg-white/10"><i data-lucide="arrow-left"></i></button>
+                        <h1 class="text-4xl font-bold text-white">Subsidiaries</h1>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        ${gridHtml}
+                    </div>
+                </div>
+            `;
+            app.innerHTML = html;
+        }
+
+        // --- VIEW: SUBSIDIARY DETAIL ---
+        function renderSubsidiaryDetail(subId) {
+            const sub = db.subsidiaries.find(s => s.id === subId);
+            
+            let gamesGrid = sub.games.map(game => `
+                <div onclick="renderPage('gameDetail', '${game.id}')" class="card-hover bg-black border border-neutral-800 rounded-lg p-4 cursor-pointer flex items-center gap-4">
+                    <img src="${game.image}" class="w-24 h-24 object-cover rounded bg-neutral-800" alt="${game.title}">
+                    <div>
+                        <h4 class="text-xl font-bold text-white">${game.title}</h4>
+                        <p class="text-sm text-gray-500">${game.description}</p>
+                    </div>
+                    <div class="ml-auto text-gray-600">
+                        <i data-lucide="chevron-right"></i>
+                    </div>
+                </div>
+            `).join('');
+
+            const html = `
+                <div class="fade-in max-w-5xl mx-auto">
+                     <div class="mb-8 flex items-center gap-3 text-sm text-gray-500">
+                        <button onclick="renderPage('subsidiaries')" class="hover:text-white flex items-center gap-1"><i data-lucide="chevron-left" class="w-4 h-4"></i> All Subsidiaries</button>
+                        <span>/</span>
+                        <span class="text-white">${sub.name}</span>
+                    </div>
+
+                    <div class="bg-neutral-900 rounded-2xl p-8 md:p-12 border border-white/5 mb-12 flex flex-col md:flex-row gap-8 items-start">
+                        <img src="${sub.image}" class="w-32 h-32 rounded-full object-cover border-2 border-white/10" alt="${sub.name}">
+                        <div>
+                            <h1 class="text-4xl font-bold text-white mb-2">${sub.name}</h1>
+                            <p class="text-purple-400 font-mono mb-4">${sub.tagline}</p>
+                            <p class="text-gray-300 max-w-2xl mb-4">${sub.fullText || sub.description}</p>
+                        </div>
+                    </div>
+
+                    <h2 class="text-2xl font-bold text-white mb-6 border-b border-white/10 pb-4">Projects by ${sub.name}</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        ${gamesGrid.length > 0 ? gamesGrid : '<p class="text-gray-500 italic">No public projects listed yet.</p>'}
+                    </div>
+                </div>
+            `;
+            app.innerHTML = html;
+        }
+
+        // --- VIEW: PARTNERS LIST ---
+        function renderPartners() {
+            let gridHtml = db.partners.map(partner => `
+                <div onclick="renderPage('partnerDetail', '${partner.id}')" class="fade-in cursor-pointer bg-neutral-900 p-6 rounded-xl border border-white/5 flex flex-col items-center text-center card-hover group">
+                    <div class="w-24 h-24 rounded-full overflow-hidden mb-4 border border-white/10">
+                        <img src="${partner.image}" class="w-full h-full object-cover" alt="${partner.name}">
+                    </div>
+                    <h3 class="text-xl font-bold text-white group-hover:text-green-400 transition-colors">${partner.name}</h3>
+                    <p class="text-xs text-gray-500 uppercase font-bold tracking-wider mb-2">${partner.type}</p>
+                    <p class="text-gray-400 text-sm mb-4 line-clamp-2">${partner.description}</p>
+                    <span class="text-xs text-gray-600 flex items-center gap-1">View Profile <i data-lucide="arrow-right" class="w-3 h-3"></i></span>
+                </div>
+            `).join('');
+
+            const html = `
+                <div class="fade-in">
+                    <div class="mb-12 flex items-center gap-4">
+                        <button onclick="renderPage('home')" class="p-2 rounded-full bg-white/5 hover:bg-white/10"><i data-lucide="arrow-left"></i></button>
+                        <h1 class="text-4xl font-bold text-white">Strategic Partners</h1>
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+                        ${gridHtml}
+                    </div>
+                </div>
+            `;
+            app.innerHTML = html;
+        }
+
+        // --- VIEW: PARTNER DETAIL ---
+        function renderPartnerDetail(partnerId) {
+            const partner = db.partners.find(p => p.id === partnerId);
+
+            const html = `
+                <div class="fade-in max-w-3xl mx-auto">
+                    <div class="mb-8 flex items-center gap-3 text-sm text-gray-500">
+                        <button onclick="renderPage('partners')" class="hover:text-white flex items-center gap-1"><i data-lucide="chevron-left" class="w-4 h-4"></i> All Partners</button>
+                        <span>/</span>
+                        <span class="text-white">${partner.name}</span>
+                    </div>
+
+                    <div class="bg-neutral-900 border border-white/10 rounded-2xl p-8 text-center md:text-left flex flex-col md:flex-row items-center md:items-start gap-8">
+                        <img src="${partner.image}" class="w-32 h-32 rounded-full object-cover border-4 border-black" alt="${partner.name}">
+                        <div>
+                            <h1 class="text-3xl font-bold text-white mb-2">${partner.name}</h1>
+                            <span class="inline-block bg-green-900/30 text-green-400 text-xs font-bold px-3 py-1 rounded-full mb-4">${partner.type}</span>
+                            <p class="text-gray-300 text-lg leading-relaxed mb-6">${partner.fullText || partner.description}</p>
+                            
+                            <a href="${partner.website || '#'}" target="_blank" class="inline-flex items-center gap-2 text-white bg-white/10 hover:bg-white/20 px-4 py-2 rounded transition-colors font-medium text-sm">
+                                <i data-lucide="globe" class="w-4 h-4"></i> Visit Official Website
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            `;
+            app.innerHTML = html;
+        }
+
+        // Init: Call renderPage on window load, ensuring all external scripts (like lucide.js) are available.
+        window.onload = function() {
+            renderPage('home');
+        };
+
+    </script>
+</body>
+</html>
