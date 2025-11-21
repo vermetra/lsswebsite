@@ -19,17 +19,6 @@ The Left-Sided Studios website is built into a single, self-contained index.html
 
 You need a modern web browser (Chrome, Firefox, Edge, Safari, etc.). No special server-side dependencies are required.
 
-### **Local Installation**
-
-1. **Clone the repository:**  
-   git clone \[https://github.com/YourUsername/left-sided-studios-website.git\](https://github.com/YourUsername/left-sided-studios-website.git)  
-   cd left-sided-studios-website
-
-2. Open the file:  
-   Simply double-click the index.html file in your file explorer, or right-click and choose "Open with \[Your Browser\]".
-
-The website will immediately load in your browser.
-
 ## **📁 Project Structure**
 
 The entire application logic, structure, and styling are contained within one file:
@@ -42,7 +31,7 @@ The data for all games, subsidiaries, partners, and team members is stored direc
 
 ## **🔗 Links**
 
-* **Official Google Site:** [https://sites.google.com/view/leftsidedstudios/home?authuser=0](https://sites.google.com/view/leftsidedstudios/home?authuser=0)  
+* **The Original Google Site:** [https://sites.google.com/view/leftsidedstudios/home?authuser=0](https://sites.google.com/view/leftsidedstudios/home?authuser=0)  
 * **GameJolt Profile:** [https://gamejolt.com/@LeftSidedStudios](https://gamejolt.com/@LeftSidedStudios)  
 * **Discord Server:** [https://discord.gg/A8XMvSnkCU](https://discord.gg/A8XMvSnkCU)
 
