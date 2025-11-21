@@ -46,14 +46,21 @@
     <!-- Navigation -->
     <nav class="fixed top-0 w-full z-50 bg-black/80 backdrop-blur-md border-b border-white/10">
         <div class="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
-            <div class="text-xl font-bold tracking-tighter cursor-pointer hover:text-white transition-colors" onclick="renderPage('home')">
-                LEFT-SIDED <span class="text-gray-500">STUDIOS</span>
+            <div class="flex items-center space-x-4">
+                <div class="text-xl font-bold tracking-tighter cursor-pointer hover:text-white transition-colors" onclick="renderPage('home')">
+                    LEFT-SIDED <span class="text-gray-500">STUDIOS</span>
+                </div>
+                <!-- New Google Site Button - Dynamically controlled by JS -->
+                <button id="google-site-button" onclick="redirectToGoogleSite()" class="hidden md:flex items-center gap-1 text-xs font-semibold text-gray-400 bg-white/5 px-3 py-1 rounded-full hover:bg-white/10 transition-colors">
+                    <i data-lucide="arrow-left" class="w-3 h-3"></i> Back to Google Site
+                </button>
             </div>
+            
             <div class="hidden md:flex space-x-8 text-sm font-medium text-gray-400">
                 <button onclick="renderPage('games')" class="hover:text-white transition-colors">GAMES</button>
                 <button onclick="renderPage('subsidiaries')" class="hover:text-white transition-colors">SUBSIDIARIES</button>
                 <button onclick="renderPage('partners')" class="hover:text-white transition-colors">PARTNERS</button>
-                <button onclick="scrollToBottom()" class="hover:text-white transition-colors">CONTACT</button>
+                <button onclick="renderPage('contact')" class="hover:text-white transition-colors">CONTACT</button>
             </div>
             <button class="md:hidden text-white" onclick="toggleMobileMenu()">
                 <i data-lucide="menu"></i>
@@ -66,6 +73,10 @@
                 <button onclick="renderPage('games'); toggleMobileMenu()" class="text-left text-gray-300">Games</button>
                 <button onclick="renderPage('subsidiaries'); toggleMobileMenu()" class="text-left text-gray-300">Subsidiaries</button>
                 <button onclick="renderPage('partners'); toggleMobileMenu()" class="text-left text-gray-300">Partners</button>
+                <button onclick="renderPage('contact'); toggleMobileMenu()" class="text-left text-gray-300">Contact</button>
+                <button onclick="redirectToGoogleSite(); toggleMobileMenu()" class="text-left text-xs font-semibold text-gray-400 pt-4 flex items-center gap-2">
+                    <i data-lucide="arrow-left" class="w-3 h-3"></i> Back to Google Site
+                </button>
             </div>
         </div>
     </nav>
@@ -86,11 +97,8 @@
             </div>
             <div>
                 <h3 class="text-lg font-bold mb-4 text-white">Connect</h3>
-                <ul class="space-y-2 text-sm text-gray-500">
-                    <li><a href="https://gamejolt.com/@LeftSidedStudios" target="_blank" class="hover:text-white transition-colors">GameJolt</a></li>
-                    <li><a href="https://youtube.com/@vermetra" target="_blank" class="hover:text-white transition-colors">YouTube (Vermetra)</a></li>
-                    <li><a href="#" class="hover:text-white transition-colors">Discord</a></li>
-                    <li><a href="mailto:leftsidedstudios@gmail.com" class="hover:text-white transition-colors">leftsidedstudios@gmail.com</a></li>
+                <ul id="connect-links" class="space-y-2 text-sm text-gray-500">
+                    <!-- Links dynamically generated here by updateConnectLinks() -->
                 </ul>
             </div>
         </div>
@@ -101,16 +109,65 @@
 
     <!-- JAVASCRIPT LOGIC -->
     <script>
+        // Global state for current page context
+        let currentPageName = 'home';
+        let currentPageId = null;
+
         // ==========================================
-        // DATABASE: OFFICIAL CONTENT FROM GOOGLE SITES
+        // DATABASE: OFFICIAL CONTENT
         // ==========================================
         const db = {
             about: {
                 title: "Welcome to Left-Sided Studios",
                 subtitle: "Explore our creations, updates, and fan content, including unique experiences inspired by popular franchises.",
-                // UPDATED: Left Sided Studios Logo
-                featuredImage: "https://raw.githubusercontent.com/vermetra/lsswebsite/main/images/games/leftsided1920.png?raw=true", 
+                featuredImage: "https://raw.githubusercontent.com/vermetra/lsswebsite/main/images/studios/leftsided1920.png?raw=true", 
                 text: "Hey all! This is Vermetra, Co-Founder of Left-Sided Studios. We are an independent game development studio sharing original games and projects on GameJolt and other platforms. We build unique experiences ranging from original IPs to fan-inspired media."
+            },
+            // Google Site Mapping - UPDATED WITH ?authuser=0
+            siteMap: {
+                home: "https://sites.google.com/view/leftsidedstudios/home?authuser=0", 
+                games: "https://sites.google.com/view/leftsidedstudios/games?authuser=0",
+                subsidiaries: "https://sites.google.com/view/leftsidedstudios/subsidiaries?authuser=0",
+                partners: "https://sites.google.com/view/leftsidedstudios/partners?authuser=0",
+                contact: "https://sites.google.com/view/leftsidedstudios/contact-us?authuser=0"
+            },
+            // Team and Individual Links for the Footer (Original structure)
+            people: [
+                { name: "Vermetra (Co-Founder)", link: "https://youtube.com/@vermetra", icon: "youtube" },
+                { name: "DaRealSansYT", link: "https://gamejolt.com/@DaRealSansYT", icon: "gamepad-2" }, // Assuming GameJolt presence
+                { name: "RocketBlasts (Co-Founder)", link: "https://gamejolt.com/@RocketBlasts", icon: "zap" } // Assuming GameJolt presence
+            ],
+            // NEW Comprehensive Team Details for the About Section
+            teamDetails: {
+                vermetra: {
+                    name: "Vermetra",
+                    role: "Co-Founder & Lead Developer",
+                    bio: "Gamer, Game Dev, and Co-Founder of Left-Sided Studios. Huge VλLVᴱ, FNaF, and Robot 64 Fan. I also love technology/techtube stuff.",
+                    image: "https://placehold.co/100x100/4c1d95/e0e7ff?text=V",
+                    links: [
+                        { icon: "youtube", url: "https://youtube.com/@vermetra", label: "YouTube" },
+                        { icon: "twitter", url: "https://x.com/vermetra", label: "X (Twitter)" },
+                    ]
+                },
+                darealsansyt: {
+                    name: "DaRealSansYT",
+                    role: "Co-Founder & Content Creator",
+                    bio: "Nerd, YouTuber, Anime enjoyer. Avid stalker of all thing Hatsune Miku.",
+                    image: "https://placehold.co/100x100/b91c1c/fee2e2?text=S",
+                    links: [
+                        { icon: "youtube", url: "https://youtube.com/@SansYT4Real", label: "YouTube" },
+                        { icon: "twitter", url: "https://x.com/darealsansyt", label: "X (Twitter)" },
+                    ]
+                },
+                rocketblasts: {
+                    name: "RocketBlasts",
+                    role: "Co-Founder & Creative Designer",
+                    bio: "Co-Founder and Creative Designer for LSS. Focusing on innovative game mechanics and visual identity for our titles.",
+                    image: "https://placehold.co/100x100/065f46/d1fae5?text=R",
+                    links: [
+                        { icon: "youtube", url: "https://www.youtube.com/@Rocketblast1843", label: "YouTube" },
+                    ]
+                }
             },
             // ---------------------------------
             // MAIN STUDIO GAMES
@@ -121,7 +178,6 @@
                     title: "Cardamania",
                     description: "Lead your Academy to Victory.",
                     fullText: "The rounds are up and the attacks are inbound. Cardamania is a game inspired by Magic the Gathering Commander where you lead your Academy to Victory in this new online TCG battle game!",
-                    // UPDATED: Cardamania image
                     image: "https://raw.githubusercontent.com/vermetra/lsswebsite/main/images/games/cardamania_promo_image.png?raw=true", 
                     releaseDate: "Available 2028",
                     link: "https://gamejolt.com/games/cardamania/1028689"
@@ -131,7 +187,6 @@
                     title: "Bumbl",
                     description: "Action-adventure strategy on Planet SL-3.",
                     fullText: "Bumbl is an action-adventure, strategy game inspired by that one game by that really big Japanese company. Explore the recently discovered planet SL-3, hosting a colorful cast of little 'Buggies' that are here to help you! Collect little artifacts, technology bits, and so much more!",
-                    // UPDATED: Bumbl image (Using 'wander' logo as requested)
                     image: "https://raw.githubusercontent.com/vermetra/lsswebsite/main/images/games/wander_logo_bumbl.png?raw=true", 
                     releaseDate: "Coming Soon",
                     link: "https://gamejolt.com/games/bumbl/825643"
@@ -141,7 +196,6 @@
                     title: "Create or Destroy: Battlegrounds",
                     description: "A sandbox combat experience.",
                     fullText: "Enter the Battlegrounds. A sandbox combat experience where creativity meets destruction. Build your defenses, craft your loadout, and tear down your enemies.",
-                    // UPDATED: Create or Destroy image
                     image: "https://raw.githubusercontent.com/vermetra/lsswebsite/main/images/games/codb.png?raw=true", 
                     releaseDate: "Indefinetly on hold",
                     link: "https://gamejolt.com/games/createordestroy/760772"
@@ -157,16 +211,13 @@
                     tagline: "Experimental & Fan Projects",
                     description: "Creators of The Reactor, Five Shifts at Fazbear's, and The Diner.",
                     fullText: "ANdᴱ Studios focuses on experimental gameplay and high-quality fan works. They are a key pillar of the Left-Sided family.",
-                    // Subsidiary logo using raw asset path
-                    image: "https://raw.githubusercontent.com/vermetra/lsswebsite/main/assets/ande.png",
-                    // SUBSIDIARY GAMES
+                    image: "https://raw.githubusercontent.com/vermetra/lsswebsite/main/images/studios/ande_banner.png?raw=true",
                     games: [
                         {
                             id: "game_ande_fnaf",
                             title: "Five Shifts at Fazbear's",
                             description: "A survival horror fan-game.",
                             fullText: "You work as a security guard at the local, recently opened Freddy Fazbear's Pizza Parlor. Featuring State of the art \"Animatronics\", performing and singing robots to bring joy to the children. Recently, the Nightguard stopped showing responding to calls and showing up to work after last night's shift. So you were given a 50% raise to work his shift.",
-                            // UPDATED: Five Shifts at Fazbear's image
                             image: "https://raw.githubusercontent.com/vermetra/lsswebsite/main/images/games/fsaf.png?raw=true", 
                             releaseDate: "Available on GameJolt",
                             link: "https://gamejolt.com/games/fsaf/989425"
@@ -176,7 +227,6 @@
                             title: "The Reactor",
                             description: "Simulation and crisis management.",
                             fullText: "Play as John Rendel, a low-level intern at the Zielum plant, who just so happened to be 2 doors down from ground zero. Your goal is to escape the Superreactor grounds to find your family and get out of Simmersville.",
-                            // UPDATED: The Reactor image
                             image: "https://raw.githubusercontent.com/vermetra/lsswebsite/main/images/games/thereactor_banner.png?raw=true", 
                             releaseDate: "Available on GameJolt",
                             link: "https://gamejolt.com/games/thereactor/1028009"
@@ -189,15 +239,13 @@
                     tagline: "Dark Narrative Games",
                     description: "Home of Shadow of The Sanctified.",
                     fullText: "Gotch-ya Studios specializes in darker, narrative-driven experiences that challenge the player's perception.",
-                    // Subsidiary logo using raw asset path
-                    image: "https://raw.githubusercontent.com/vermetra/lsswebsite/main/assets/gotchya.png",
+                    image: "https://placehold.co/800x400/3e0909/fecaca?text=GOTCH-YA+STUDIOS",
                     games: [
                         {
                             id: "game_gotchya_shadow",
                             title: "Shadow of The Sanctified",
                             description: "Dark fantasy RPG adventure.",
                             fullText: "Explore a world shrouded in darkness. Shadow of The Sanctified combines classic RPG elements with modern storytelling to create an atmospheric journey into the unknown.",
-                            // UPDATED: Shadow of The Sanctified image
                             image: "https://raw.githubusercontent.com/vermetra/lsswebsite/main/images/games/sots1.png?raw=true", 
                             releaseDate: "Available on GameJolt",
                             link: "https://gamejolt.com/games/SOTF1/1027993"
@@ -210,16 +258,14 @@
                     tagline: "Quirky & Energetic",
                     description: "Developers of Eyebo.",
                     fullText: "Bomb Banana Studios brings energy and color to the collective. Their games are known for unique visual styles and fun mechanics.",
-                    // Subsidiary logo using raw asset path
-                    image: "https://raw.githubusercontent.com/vermetra/lsswebsite/main/assets/bombbanana.png",
+                    image: "https://placehold.co/800x400/ffaa00/1f2937?text=BOMB+BA-NANA+STUDIOS",
                     games: [
                         {
                             id: "game_bomb_eyebo",
                             title: "Eyebo",
                             description: "Hack-and-slash platformer.",
                             fullText: "A hack-and-slash platformer through a grim and monster-filled world. You follow Eyebo, an aspiring warrior, as he tries to make his way to the top.",
-                            // Game image using raw asset path
-                            image: "https://raw.githubusercontent.com/vermetra/lsswebsite/main/assets/eyebo.png",
+                            image: "https://placehold.co/800x600/1e40af/bfdbfe?text=EYEBO+ACTION+PLATFORMER",
                             releaseDate: "View on Google Sites",
                             link: "https://sites.google.com/view/leftsidedstudios/subsidiaries/bomb-banana-studios/eyebo?authuser=0"
                         }
@@ -231,8 +277,7 @@
                     tagline: "Media & Production",
                     description: "Supporting media production for Left-Sided projects.",
                     fullText: "Skullix Media Group handles various media production aspects, ensuring high-quality content delivery across the network.",
-                    // Subsidiary logo using raw asset path
-                    image: "https://raw.githubusercontent.com/vermetra/lsswebsite/main/assets/skullix.png",
+                    image: "https://raw.githubusercontent.com/vermetra/lsswebsite/main/images/studios/skullix.png?raw=true",
                     games: []
                 },
                 {
@@ -241,16 +286,14 @@
                     tagline: "Innovative Gameplay",
                     description: "Focused on pushing boundaries with 'Project Sentinel'.",
                     fullText: "Endgame Studios is the latest addition to our roster, currently working on 'Project Sentinel', an innovative multiplayer tower defense game.",
-                    // Subsidiary logo using raw asset path
-                    image: "https://raw.githubusercontent.com/vermetra/lsswebsite/main/assets/endgame.png",
+                    image: "https://raw.githubusercontent.com/vermetra/lsswebsite/main/images/studios/endgamestudios.png?raw=true",
                     games: [
                         {
                             id: "game_endgame_sentinel",
                             title: "Project Sentinel",
                             description: "Innovative multiplayer tower defense.",
                             fullText: "Project Sentinel is the current unannounced project from Endgame Studios. It is planned to be an innovative multiplayer tower defense game that focuses on cooperative strategy and resource management, pushing the boundaries of the genre.",
-                            // Placeholder image using raw asset path
-                            image: "https://raw.githubusercontent.com/vermetra/lsswebsite/main/assets/projects.png", 
+                            image: "https://placehold.co/800x600/166534/a7f3d0?text=PROJECT+SENTINEL+TD", 
                             releaseDate: "Unannounced",
                             link: null 
                         }
@@ -267,30 +310,61 @@
                     type: "Strategic Partner",
                     description: "Collaborating on shared development goals.",
                     fullText: "Citadel Studios is a close partner of Left-Sided Studios, working together to expand the reach and quality of indie games.",
-                    // Partner logo using raw asset path
-                    image: "https://raw.githubusercontent.com/vermetra/lsswebsite/main/assets/citadel.png",
+                    image: "https://raw.githubusercontent.com/vermetra/lsswebsite/main/images/studios/cs_banner.png?raw=true",
                     website: "https://gamejolt.com/@CitadelStudiosOfficial"
                 }
             ]
         };
 
         // ==========================================
-        // 2. RENDER LOGIC
+        // 2. CORE FUNCTIONS
         // ==========================================
         const app = document.getElementById('app');
 
-        function scrollToBottom() {
-            window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
-        }
-
         function toggleMobileMenu() {
             document.getElementById('mobile-menu').classList.toggle('hidden');
+        }
+        
+        // Dynamic link calculation for the "Back to Google Site" button
+        function getGoogleSiteUrl() {
+            let url = db.siteMap.home;
+            switch(currentPageName) {
+                case 'games':
+                case 'gameDetail':
+                    url = db.siteMap.games;
+                    break;
+                case 'subsidiaries':
+                case 'subsidiaryDetail':
+                    url = db.siteMap.subsidiaries;
+                    break;
+                case 'partners':
+                case 'partnerDetail':
+                    url = db.siteMap.partners;
+                    break;
+                case 'contact':
+                    url = db.siteMap.contact;
+                    break;
+                default:
+                    url = db.siteMap.home;
+            }
+            return url;
+        }
+
+        // Redirect function using the calculated URL
+        function redirectToGoogleSite() {
+            const url = getGoogleSiteUrl();
+            window.open(url, '_blank');
         }
 
         function renderPage(pageName, id = null) {
             window.scrollTo(0,0);
             app.innerHTML = '';
             
+            // Update global state
+            currentPageName = pageName;
+            currentPageId = id;
+
+            // Render view based on pageName
             switch(pageName) {
                 case 'home': renderHome(); break;
                 case 'games': renderGamesList(db.games, "Our Games"); break;
@@ -299,16 +373,141 @@
                 case 'subsidiaryDetail': renderSubsidiaryDetail(id); break;
                 case 'partners': renderPartners(); break;
                 case 'partnerDetail': renderPartnerDetail(id); break;
+                case 'contact': renderContact(); break; // New Contact Page
                 default: renderHome();
             }
+
             // Ensure icons are created after content is rendered
+            if (typeof lucide !== 'undefined') {
+                lucide.createIcons();
+            }
+            
+            // Update footer links and button visibility after rendering
+            updateConnectLinks();
+        }
+
+        // Function to dynamically update footer links
+        function updateConnectLinks() {
+            const container = document.getElementById('connect-links');
+            if (!container) return;
+            
+            // Static links
+            let html = `
+                <li><a href="https://gamejolt.com/@LeftSidedStudios" target="_blank" class="hover:text-white transition-colors flex items-center gap-2"><i data-lucide="monitor" class="w-4 h-4"></i> GameJolt (Main)</a></li>
+                <!-- UPDATED Discord Link -->
+                <li><a href="https://discord.gg/A8XMvSnkCU" target="_blank" class="hover:text-white transition-colors flex items-center gap-2"><i data-lucide="message-square-text" class="w-4 h-4"></i> Discord Server</a></li>
+                <li><a href="mailto:leftsidedstudios@gmail.com" class="hover:text-white transition-colors flex items-center gap-2"><i data-lucide="mail" class="w-4 h-4"></i> Email Us</a></li>
+            `;
+
+            // Dynamic team links
+            html += '<li class="pt-4 text-white font-semibold flex items-center gap-2"><i data-lucide="users" class="w-4 h-4"></i> Team & Individual Links</li>';
+            
+            db.people.forEach(person => {
+                let icon = 'user'; // Default icon
+                if (person.icon === 'youtube') icon = 'youtube';
+                else if (person.icon === 'gamepad-2') icon = 'gamepad-2';
+                else if (person.icon === 'zap') icon = 'zap';
+
+                html += `
+                    <li>
+                        <a href="${person.link}" target="_blank" class="hover:text-white transition-colors flex items-center gap-2">
+                            <i data-lucide="${icon}" class="w-4 h-4 text-gray-600"></i> ${person.name}
+                        </a>
+                    </li>
+                `;
+            });
+
+            container.innerHTML = html;
+            
+            // Re-render lucide icons
             if (typeof lucide !== 'undefined') {
                 lucide.createIcons();
             }
         }
 
+        // Helper to render a single founder card
+        function renderFounderCard(founder) {
+            const linkHtml = founder.links.map(link => {
+                // Use the correct Lucide icon name
+                const iconName = link.icon; 
+                return `
+                    <a href="${link.url}" target="_blank" class="text-gray-400 hover:text-white transition-colors" title="${link.label}">
+                        <i data-lucide="${iconName}" class="w-5 h-5"></i>
+                    </a>
+                `;
+            }).join('');
+
+            return `
+                <div class="bg-neutral-900 p-6 rounded-xl border border-white/5 flex flex-col items-center text-center">
+                    <img src="${founder.image}" class="w-24 h-24 rounded-full object-cover mb-4 border-4 border-neutral-700" alt="${founder.name}" onerror="this.onerror=null; this.src='https://placehold.co/96x96/4c1d95/e0e7ff?text=${founder.name.charAt(0)}';">
+                    <h3 class="text-2xl font-bold text-white">${founder.name}</h3>
+                    <p class="text-sm font-mono text-blue-400 mb-4">${founder.role}</p>
+                    <p class="text-gray-400 text-sm italic mb-4 flex-grow">${founder.bio}</p>
+                    <div class="flex space-x-4 mt-auto">
+                        ${linkHtml}
+                    </div>
+                </div>
+            `;
+        }
+        
+        // Function to create a mailto link from form data
+        function sendContactEmail(event) {
+            event.preventDefault(); // Stop default form submission
+
+            const name = document.getElementById('contact-name').value;
+            const email = document.getElementById('contact-email').value;
+            const subject = document.getElementById('contact-subject').value;
+            const message = document.getElementById('contact-message').value;
+            const statusMessage = document.getElementById('email-status-message');
+
+            if (!name || !subject || !message) {
+                statusMessage.textContent = "Please fill out all required fields (Name, Subject, Message).";
+                statusMessage.classList.remove('hidden', 'text-green-400');
+                statusMessage.classList.add('text-red-400');
+                return;
+            }
+
+            // Construct the email body
+            let emailBody = `Sender Name: ${name}\n`;
+            if (email) {
+                emailBody += `Sender Email: ${email}\n\n`;
+            } else {
+                emailBody += `Sender Email: Not Provided\n\n`;
+            }
+            emailBody += "--- Message ---\n";
+            emailBody += message;
+            
+            // Encode subject and body for the mailto link
+            const encodedSubject = encodeURIComponent(`LSS Website Inquiry: ${subject}`);
+            const encodedBody = encodeURIComponent(emailBody);
+            
+            const mailtoLink = `mailto:leftsidedstudios@gmail.com?subject=${encodedSubject}&body=${encodedBody}`;
+
+            // Open the mail client
+            window.location.href = mailtoLink;
+
+            // Show a success message
+            statusMessage.textContent = "Your email client is opening with your pre-filled message! Please confirm and send the draft.";
+            statusMessage.classList.remove('hidden', 'text-red-400');
+            statusMessage.classList.add('text-green-400');
+            document.getElementById('contact-form').reset(); // Clear form after 'send' action
+            
+            // Reset status message appearance after a few seconds
+            setTimeout(() => {
+                statusMessage.classList.add('hidden');
+                statusMessage.classList.remove('text-green-400');
+                statusMessage.classList.add('text-gray-500');
+            }, 8000);
+        }
+
+        // ==========================================
+        // 3. VIEW FUNCTIONS
+        // ==========================================
+
         // --- VIEW: HOME ---
         function renderHome() {
+            const foundersHtml = Object.values(db.teamDetails).map(renderFounderCard).join('');
+
             const html = `
                 <div class="fade-in space-y-20">
                     <section class="relative h-[60vh] w-full rounded-2xl overflow-hidden border border-white/10">
@@ -319,6 +518,7 @@
                             <p class="text-xl text-gray-300 leading-relaxed">${db.about.subtitle}</p>
                         </div>
                     </section>
+                    
                     <section class="grid grid-cols-1 md:grid-cols-3 gap-6">
                         <div onclick="renderPage('games')" class="card-hover bg-neutral-900 p-8 rounded-xl border border-white/5 cursor-pointer group">
                             <i data-lucide="gamepad-2" class="w-10 h-10 text-white mb-4 group-hover:text-blue-400 transition-colors"></i>
@@ -336,8 +536,99 @@
                             <p class="text-gray-500">Our collaborative network.</p>
                         </div>
                     </section>
+                    
+                    <!-- Meet the Co-Founders Section -->
+                    <section class="mt-20">
+                        <h2 class="text-4xl font-extrabold text-center text-white mb-4">Meet the Co-Founders</h2>
+                        <p class="text-center text-gray-400 text-lg mb-12 max-w-3xl mx-auto">
+                            Left-Sided Studios is founded by three cousins—Vermetra, DaRealSansYT, and RocketBlasts—united by a passion for gaming and creation.
+                        </p>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                            ${foundersHtml}
+                        </div>
+                    </section>
+
                     <section class="max-w-4xl mx-auto text-center border-t border-white/10 pt-12">
                         <p class="text-2xl md:text-3xl font-light text-gray-400 leading-relaxed">"${db.about.text}"</p>
+                    </section>
+                </div>
+            `;
+            app.innerHTML = html;
+        }
+
+        // --- VIEW: CONTACT ---
+        function renderContact() {
+            const html = `
+                <div class="fade-in max-w-4xl mx-auto">
+                    <h1 class="text-5xl font-extrabold text-white mb-4">Get In Touch</h1>
+                    <p class="text-xl text-gray-400 mb-12">We love hearing from our fans, partners, and aspiring developers. Connect with us through the channels below!</p>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-12">
+                        <!-- Primary Contacts Section -->
+                        <div>
+                            <h2 class="text-3xl font-bold text-white mb-6 border-b border-white/10 pb-3">Official Channels</h2>
+                            <div class="space-y-6">
+                                <div class="flex items-start gap-4 p-4 rounded-xl bg-neutral-900 border border-white/5">
+                                    <i data-lucide="mail" class="w-6 h-6 text-blue-400 mt-1"></i>
+                                    <div>
+                                        <h3 class="text-xl font-semibold text-white">General & Business Inquiries</h3>
+                                        <p class="text-gray-400 text-sm">For partnerships, press, or business matters.</p>
+                                        <a href="mailto:leftsidedstudios@gmail.com" class="text-blue-400 font-medium hover:underline block mt-2">leftsidedstudios@gmail.com</a>
+                                    </div>
+                                </div>
+                                <div class="flex items-start gap-4 p-4 rounded-xl bg-neutral-900 border border-white/5">
+                                    <i data-lucide="message-square-text" class="w-6 h-6 text-purple-400 mt-1"></i>
+                                    <div>
+                                        <h3 class="text-xl font-semibold text-white">Community & Support</h3>
+                                        <p class="text-gray-400 text-sm">Join our official Discord server for real-time chat, support, and announcements.</p>
+                                        <!-- UPDATED Discord Link -->
+                                        <a href="https://discord.gg/A8XMvSnkCU" target="_blank" class="text-purple-400 font-medium hover:underline block mt-2">Join Our Discord Server</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Team Links Section (reusing people data) -->
+                        <div>
+                            <h2 class="text-3xl font-bold text-white mb-6 border-b border-white/10 pb-3">Team & Content Creators</h2>
+                            <div class="space-y-4">
+                                ${db.people.map(person => {
+                                    let icon = 'user'; 
+                                    if (person.icon === 'youtube') icon = 'youtube';
+                                    else if (person.icon === 'gamepad-2') icon = 'gamepad-2';
+                                    else if (person.icon === 'zap') icon = 'zap';
+
+                                    return `
+                                        <a href="${person.link}" target="_blank" class="flex items-center justify-between p-3 rounded-lg bg-neutral-900 hover:bg-neutral-800 transition-colors border border-white/5">
+                                            <div class="flex items-center gap-4">
+                                                <i data-lucide="${icon}" class="w-5 h-5 text-gray-500"></i>
+                                                <span class="text-white">${person.name}</span>
+                                            </div>
+                                            <i data-lucide="external-link" class="w-4 h-4 text-gray-600"></i>
+                                        </a>
+                                    `;
+                                }).join('')}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Live Mailto Form Section -->
+                    <section class="mt-16 bg-neutral-900 p-10 rounded-2xl border border-white/5">
+                        <h2 class="text-3xl font-bold text-white mb-6">Send Us a Message</h2>
+                        <form id="contact-form" onsubmit="sendContactEmail(event)">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <input type="text" id="contact-name" placeholder="Your Name (Required)" required class="bg-neutral-950 p-3 rounded-lg border border-neutral-700 text-white focus:ring-blue-500 focus:border-blue-500">
+                                <input type="email" id="contact-email" placeholder="Your Email (for our reference)" class="bg-neutral-950 p-3 rounded-lg border border-neutral-700 text-white focus:ring-blue-500 focus:border-blue-500">
+                            </div>
+                            <input type="text" id="contact-subject" placeholder="Subject (Required)" required class="w-full mt-4 bg-neutral-950 p-3 rounded-lg border border-neutral-700 text-white focus:ring-blue-500 focus:border-blue-500">
+                            <textarea rows="5" id="contact-message" placeholder="Your Message (Required)" required class="w-full mt-4 bg-neutral-950 p-3 rounded-lg border border-neutral-700 text-white focus:ring-blue-500 focus:border-blue-500"></textarea>
+                            <button type="submit" class="mt-6 w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-lg transition-colors shadow-lg shadow-blue-500/30">
+                                Send Message
+                            </button>
+                            <p id="email-status-message" class="text-sm text-gray-500 mt-3 text-center hidden">
+                                Your email client should now be open with your message pre-filled!
+                            </p>
+                        </form>
                     </section>
                 </div>
             `;
@@ -404,7 +695,6 @@
                 ? `renderPage('${parentContext}', '${parentId}')` 
                 : `renderPage('${parentContext}')`;
 
-            // Button logic updated to check for game.link being null
             const isLinkActive = game.link !== null;
             const buttonText = isLinkActive ? (game.link.includes('gamejolt') ? 'VIEW ON GAMEJOLT' : 'VIEW WEBSITE') : 'COMING SOON';
             const buttonAction = isLinkActive ? `window.open('${game.link}', '_blank')` : '';
@@ -439,7 +729,7 @@
                                     </div>
                                     <div>
                                         <span class="block text-xs text-gray-600">PLATFORM</span>
-                                        <span class="text-white">PC / Browser</span>
+                                        <span class="text-white">PC Only</span>
                                     </div>
                                     <button ${isLinkActive ? '' : 'disabled'} onclick="${buttonAction}" class="w-full mt-4 font-bold py-3 rounded transition-colors ${buttonClass}">
                                         ${buttonText}
@@ -458,6 +748,7 @@
             let gridHtml = db.subsidiaries.map(sub => `
                 <div onclick="renderPage('subsidiaryDetail', '${sub.id}')" class="fade-in card-hover bg-neutral-900 border border-white/5 rounded-xl overflow-hidden cursor-pointer flex flex-col h-full">
                     <div class="h-48 overflow-hidden relative">
+                         <!-- Placeholder color adjusted to match new placeholders -->
                          <div class="absolute inset-0 bg-purple-900/20 mix-blend-overlay"></div>
                          <img src="${sub.image}" class="w-full h-full object-cover" alt="${sub.name}" onerror="this.onerror=null; this.src='https://placehold.co/800x400/3730a3/FFFFFF?text=${sub.name.replace(/\s/g, '+')}';">
                     </div>
@@ -491,7 +782,6 @@
         function renderSubsidiaryDetail(subId) {
             const sub = db.subsidiaries.find(s => s.id === subId);
 
-            // Fallback if subsidiary is not found
             if (!sub) {
                 console.error("Subsidiary not found for ID:", subId);
                 renderPage('subsidiaries');
@@ -569,7 +859,6 @@
         function renderPartnerDetail(partnerId) {
             const partner = db.partners.find(p => p.id === partnerId);
 
-            // Fallback if partner is not found
             if (!partner) {
                 console.error("Partner not found for ID:", partnerId);
                 renderPage('partners');
