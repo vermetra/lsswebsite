@@ -9,17 +9,99 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap');
         
+        /* 1. Base Body Styles (Dark Mode Defaults) */
         body {
             font-family: 'Inter', sans-serif;
             background-color: #0a0a0a;
             color: #e5e5e5;
+            background-image: url('https://github.com/vermetra/lsswebsite/blob/main/images/lss_bg.png?raw=true');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            /* Smooth transition for theme change */
+            transition: background-color 0.5s ease-in-out, color 0.5s ease-in-out; 
         }
+
+        /* 2. Background Overlay for Readability (Dark Mode) */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            /* Base dark layer to dim the image */
+            background-color: rgba(10, 10, 10, 0.85); 
+            /* Radial gradient mask */
+            background-image: radial-gradient(circle at center, 
+                rgba(10, 10, 10, 1) 0%,      /* Center is pure black */
+                rgba(10, 10, 10, 0.9) 60%,   /* Mid-area starts blending */
+                rgba(10, 10, 10, 0.7) 100%   /* Edges are most transparent/image visible */
+            );
+            transition: background-image 0.5s ease-in-out, background-color 0.5s ease-in-out;
+        }
+
+        /* 3. LIGHT MODE STYLES */
+        body.light-mode {
+            background-color: #f7f7f7; /* Light background */
+            color: #1f2937; /* Dark text */
+        }
+
+        body.light-mode::before {
+            /* Light mode overlay - keeps center light, fades background image */
+            background-color: rgba(247, 247, 247, 0.85); 
+            background-image: radial-gradient(circle at center, 
+                rgba(255, 255, 255, 1) 0%,      /* Center is pure white */
+                rgba(247, 247, 247, 0.9) 60%,   /* Mid-area starts blending */
+                rgba(247, 247, 247, 0.7) 100%   /* Edges are most transparent/image visible */
+            );
+        }
+
+        /* Light Mode UI Overrides */
+        body.light-mode nav {
+            background-color: #ffffffd0; 
+            border-color: #e5e5e5;
+            color: #1f2937;
+        }
+        body.light-mode nav .text-gray-500 { color: #4b5563; }
+        body.light-mode nav button:hover { color: #000000; }
+        
+        body.light-mode .bg-white\/5, 
+        body.light-mode .bg-white\/10 {
+            background-color: rgba(0, 0, 0, 0.05);
+        }
+        
+        body.light-mode .bg-neutral-950, 
+        body.light-mode .bg-neutral-900 {
+            background-color: #ffffff; 
+            border-color: #e5e5e5; 
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08); /* subtle shadow in light mode */
+        }
+
+        /* Text color overrides */
+        body.light-mode .text-gray-400, 
+        body.light-mode .text-gray-500 { color: #4b5563; }
+        body.light-mode .text-gray-600 { color: #6b7280; }
+        body.light-mode .text-white { color: #1f2937; }
+        
+        /* Footer overrides */
+        body.light-mode footer {
+            background-color: #ffffff;
+            border-color: #e5e5e5;
+        }
+        body.light-mode .text-neutral-600 { color: #9ca3af; }
+
 
         /* Custom Scrollbar */
         ::-webkit-scrollbar { width: 8px; }
         ::-webkit-scrollbar-track { background: #0a0a0a; }
         ::-webkit-scrollbar-thumb { background: #333; border-radius: 4px; }
         ::-webkit-scrollbar-thumb:hover { background: #555; }
+        /* Light mode scrollbar adjustment */
+        body.light-mode ::-webkit-scrollbar-track { background: #f0f0f0; }
+        body.light-mode ::-webkit-scrollbar-thumb { background: #bbb; }
+        body.light-mode ::-webkit-scrollbar-thumb:hover { background: #999; }
 
         .fade-in {
             animation: fadeIn 0.4s ease-out forwards;
@@ -38,6 +120,10 @@
             transform: translateY(-4px);
             box-shadow: 0 10px 40px -10px rgba(255,255,255,0.1);
             border-color: rgba(255,255,255,0.4);
+        }
+        body.light-mode .card-hover:hover {
+            box-shadow: 0 10px 40px -10px rgba(0,0,0,0.15);
+            border-color: rgba(0,0,0,0.1);
         }
     </style>
 </head>
@@ -61,6 +147,10 @@
                 <button onclick="renderPage('subsidiaries')" class="hover:text-white transition-colors">SUBSIDIARIES</button>
                 <button onclick="renderPage('partners')" class="hover:text-white transition-colors">PARTNERS</button>
                 <button onclick="renderPage('contact')" class="hover:text-white transition-colors">CONTACT</button>
+                <!-- THEME TOGGLE BUTTON -->
+                <button id="theme-toggle" onclick="toggleTheme()" class="hover:text-white transition-colors">
+                    <i data-lucide="sun" class="w-5 h-5"></i>
+                </button>
             </div>
             <button class="md:hidden text-white" onclick="toggleMobileMenu()">
                 <i data-lucide="menu"></i>
@@ -74,6 +164,9 @@
                 <button onclick="renderPage('subsidiaries'); toggleMobileMenu()" class="text-left text-gray-300">Subsidiaries</button>
                 <button onclick="renderPage('partners'); toggleMobileMenu()" class="text-left text-gray-300">Partners</button>
                 <button onclick="renderPage('contact'); toggleMobileMenu()" class="text-left text-gray-300">Contact</button>
+                <button onclick="toggleTheme();" class="text-left text-gray-300 flex items-center gap-2">
+                    <i id="mobile-theme-icon" data-lucide="sun" class="w-4 h-4"></i> Theme
+                </button>
                 <button onclick="redirectToGoogleSite(); toggleMobileMenu()" class="text-left text-xs font-semibold text-gray-400 pt-4 flex items-center gap-2">
                     <i data-lucide="arrow-left" class="w-3 h-3"></i> Back to Google Site
                 </button>
@@ -143,7 +236,7 @@
                     name: "Vermetra",
                     role: "Co-Founder & Lead Developer",
                     bio: "Gamer, Game Dev, and Co-Founder of Left-Sided Studios. Huge VλLVᴱ, FNaF, and Robot 64 Fan. I also love technology/techtube stuff.",
-                    image: "https://placehold.co/100x100/4c1d95/e0e7ff?text=V",
+                    image: "https://yt3.googleusercontent.com/vZNgZ9-8_NXR-W-wpYX304GZZbEX6LgwGBgu4aw1hVJRUCJ2ghxL4_VNtjtOOxtUSXRzzSfFng=s900-c-k-c0x00ffffff-no-rj",
                     links: [
                         { icon: "youtube", url: "https://youtube.com/@vermetra", label: "YouTube" },
                         { icon: "twitter", url: "https://x.com/vermetra", label: "X (Twitter)" },
@@ -153,7 +246,7 @@
                     name: "DaRealSansYT",
                     role: "Co-Founder & Content Creator",
                     bio: "Nerd, YouTuber, Anime enjoyer. Avid stalker of all thing Hatsune Miku.",
-                    image: "https://placehold.co/100x100/b91c1c/fee2e2?text=S",
+                    image: "https://yt3.googleusercontent.com/OHT_dCH0a_OMsx2IceYotF6aRzNY-A8uxIxt29kOjK0gzJv2QCCAv3RTJpcgpoKMfmKSa7rWcA=s160-c-k-c0x00ffffff-no-rj",
                     links: [
                         { icon: "youtube", url: "https://youtube.com/@SansYT4Real", label: "YouTube" },
                         { icon: "twitter", url: "https://x.com/darealsansyt", label: "X (Twitter)" },
@@ -163,7 +256,7 @@
                     name: "RocketBlasts",
                     role: "Co-Founder & Creative Designer",
                     bio: "Co-Founder and Creative Designer for LSS. Focusing on innovative game mechanics and visual identity for our titles.",
-                    image: "https://placehold.co/100x100/065f46/d1fae5?text=R",
+                    image: "https://yt3.googleusercontent.com/yXRnUW4EWIYEiZAn3_r1vpwgYyt2Bs4d-y1Ckh6TLWBLEd2gjQjKPbfietxQEDw5DEB6w-OEaw=s160-c-k-c0x00ffffff-no-rj",
                     links: [
                         { icon: "youtube", url: "https://www.youtube.com/@Rocketblast1843", label: "YouTube" },
                     ]
@@ -325,6 +418,49 @@
             document.getElementById('mobile-menu').classList.toggle('hidden');
         }
         
+        // Function to toggle between dark and light themes
+        function toggleTheme() {
+            const body = document.body;
+            const isDarkMode = body.classList.contains('light-mode') === false;
+            
+            // Get all theme toggle icons/elements
+            const desktopToggleIcon = document.getElementById('theme-toggle')?.querySelector('i');
+            const mobileToggleIcon = document.getElementById('mobile-theme-icon');
+
+            if (isDarkMode) {
+                // Switch to Light Mode
+                body.classList.add('light-mode');
+                localStorage.setItem('theme', 'light');
+                if (desktopToggleIcon) desktopToggleIcon.setAttribute('data-lucide', 'moon');
+                if (mobileToggleIcon) mobileToggleIcon.setAttribute('data-lucide', 'moon');
+            } else {
+                // Switch to Dark Mode
+                body.classList.remove('light-mode');
+                localStorage.setItem('theme', 'dark');
+                if (desktopToggleIcon) desktopToggleIcon.setAttribute('data-lucide', 'sun');
+                if (mobileToggleIcon) mobileToggleIcon.setAttribute('data-lucide', 'sun');
+            }
+            
+            // Re-render lucide icons to ensure the theme toggle icon updates immediately
+            if (typeof lucide !== 'undefined') {
+                lucide.createIcons();
+            }
+        }
+
+        // Function to apply theme on initial page load
+        function applySavedTheme() {
+            const savedTheme = localStorage.getItem('theme');
+            const body = document.body;
+
+            // Default to dark if no preference is saved or if preference is 'dark'
+            if (!savedTheme || savedTheme === 'dark') {
+                body.classList.remove('light-mode');
+            } else if (savedTheme === 'light') {
+                body.classList.add('light-mode');
+            }
+        }
+
+
         // Dynamic link calculation for the "Back to Google Site" button
         function getGoogleSiteUrl() {
             let url = db.siteMap.home;
@@ -384,6 +520,13 @@
             
             // Update footer links and button visibility after rendering
             updateConnectLinks();
+
+            // Manually update the icon state for the theme toggle based on current body class
+            const currentTheme = document.body.classList.contains('light-mode') ? 'light' : 'dark';
+            const desktopIcon = document.getElementById('theme-toggle')?.querySelector('i');
+            const mobileIcon = document.getElementById('mobile-theme-icon');
+            if (desktopIcon) desktopIcon.setAttribute('data-lucide', currentTheme === 'light' ? 'moon' : 'sun');
+            if (mobileIcon) mobileIcon.setAttribute('data-lucide', currentTheme === 'light' ? 'moon' : 'sun');
         }
 
         // Function to dynamically update footer links
@@ -427,18 +570,24 @@
 
         // Helper to render a single founder card
         function renderFounderCard(founder) {
+            // FIX: Use the first link to make the entire card clickable, ensuring the pfp click works.
+            const primaryLink = founder.links.length > 0 ? founder.links[0].url : '#';
+
             const linkHtml = founder.links.map(link => {
                 // Use the correct Lucide icon name
                 const iconName = link.icon; 
                 return `
-                    <a href="${link.url}" target="_blank" class="text-gray-400 hover:text-white transition-colors" title="${link.label}">
+                    <a href="${link.url}" target="_blank" class="text-gray-400 hover:text-white transition-colors" title="${link.label}" onclick="event.stopPropagation()">
                         <i data-lucide="${iconName}" class="w-5 h-5"></i>
                     </a>
                 `;
             }).join('');
 
             return `
-                <div class="bg-neutral-900 p-6 rounded-xl border border-white/5 flex flex-col items-center text-center">
+                <div 
+                    class="bg-neutral-900 p-6 rounded-xl border border-white/5 flex flex-col items-center text-center cursor-pointer card-hover" 
+                    onclick="window.open('${primaryLink}', '_blank')"
+                >
                     <img src="${founder.image}" class="w-24 h-24 rounded-full object-cover mb-4 border-4 border-neutral-700" alt="${founder.name}" onerror="this.onerror=null; this.src='https://placehold.co/96x96/4c1d95/e0e7ff?text=${founder.name.charAt(0)}';">
                     <h3 class="text-2xl font-bold text-white">${founder.name}</h3>
                     <p class="text-sm font-mono text-blue-400 mb-4">${founder.role}</p>
@@ -892,7 +1041,8 @@
 
         // Init: Call renderPage on window load, ensuring all external scripts (like lucide.js) are available.
         window.onload = function() {
-            renderPage('home');
+            applySavedTheme(); // 1. Load saved theme preference
+            renderPage('home'); // 2. Render content
         };
 
     </script>
